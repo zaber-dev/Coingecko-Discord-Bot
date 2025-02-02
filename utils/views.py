@@ -18,7 +18,11 @@ class MarketChartView(disnake.ui.View):
         """Generate chart with caching"""
         cache_key = f"{self.crypto_id}-{self.currency}-{days}"
         if cache_key in chart_cache:
-            return chart_cache[cache_key]
+            buf = chart_cache[cache_key]
+            plt.savefig(buf, format='png')
+            buf.seek(0)
+            plt.close()
+            return buf
         
         try:
             response = requests.get(
@@ -40,11 +44,10 @@ class MarketChartView(disnake.ui.View):
             plt.tight_layout()
             
             buf = io.BytesIO()
+            chart_cache[cache_key] = buf
             plt.savefig(buf, format='png')
             buf.seek(0)
             plt.close()
-            
-            chart_cache[cache_key] = buf
             return buf
         except Exception as e:
             print(f"Error generating chart: {e}")
@@ -73,6 +76,7 @@ class MarketChartView(disnake.ui.View):
             file = disnake.File(buf, filename="chart.png")
             self.embed.set_image(file=file)
             await interaction.response.edit_message(embed=self.embed)
+
     @disnake.ui.button(label="90D", style=disnake.ButtonStyle.primary)
     async def three_month_button(self, button: disnake.ui.Button, interaction: disnake.Interaction):
         buf = await self.generate_chart(90)
