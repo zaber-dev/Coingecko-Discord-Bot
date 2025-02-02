@@ -2,3 +2,6 @@ disnake
 requests
 matplotlib
 python-dotenv
+cachetools
+fuzzywuzzy
+python-Levenshtein
