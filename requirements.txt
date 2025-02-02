@@ -1,0 +1,4 @@
+disnake
+requests
+matplotlib
+python-dotenv
